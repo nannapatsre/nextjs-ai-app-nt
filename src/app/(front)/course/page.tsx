@@ -7,9 +7,6 @@ export default async function CoursePage() {
 
   return (
     <main>
-      {/* {
-        JSON.stringify(courseResponse.data)
-      } */}
       {
         courseResponse.data.length > 0 && <FeaturesCourse courses={courseResponse.data} />
       }
