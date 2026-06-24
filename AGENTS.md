@@ -18,5 +18,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Prisma 7**: uses `prisma.config.ts` and MariaDB driver adapter. Generate client with `npx prisma generate` (output: `../generated/prisma`, gitignored). Prisma CLI needs `DATABASE_URL` in `.env`.
 - **shadcn/ui**: radix-luma style, Remix Icons, RSC enabled, `@/components/ui/` alias.
 - **Tailwind v4**: CSS-first config via `@theme` directive in `globals.css`. No `tailwind.config`. PostCSS uses `@tailwindcss/postcss`.
+- **Design System**: QuestUI (fantasy/RPG style). Follow `docs/questui-DESIGN.md` for colors, typography (Cinzel/Spectral), and ornate styling.
 - **State**: Zustand cart store with `persist` middleware (localStorage key: `skill-cart`). See `src/lib/cart-store.ts`.
 - **Docker**: multi-stage build with `node:24-alpine`, standalone output (`output: "standalone"` assumed), runs `npx prisma generate` during build.
