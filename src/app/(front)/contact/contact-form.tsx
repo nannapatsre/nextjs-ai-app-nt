@@ -1,22 +1,21 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import React, { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+import { 
+  Field, 
+  FieldError, 
+  FieldGroup, 
+  FieldLabel 
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
+import { Controller } from 'react-hook-form'
 import { contactSchema, ContactFormValues } from '@/lib/validations/contact'
 
 export default function ContactForm() {
@@ -44,14 +43,14 @@ export default function ContactForm() {
         const result = await response.json()
 
         if (!result.success) {
-          throw new Error(result.error || 'เกิดข้อผิดพลาดในการส่งข้อความ')
+          throw new Error(result.error || 'Something went wrong')
         }
 
-        toast.success('ส่งข้อความเรียบร้อยแล้ว')
+        toast.success('ส่งข้อความสำเร็จแล้ว')
         setIsSuccess(true)
         form.reset()
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการส่งข้อความ';
+        const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการส่งข้อมูล';
         toast.error(errorMessage);
       }
     })
@@ -64,7 +63,7 @@ export default function ContactForm() {
         <div className="space-y-2">
           <h3 className="text-xl font-semibold">ส่งข้อความสำเร็จ!</h3>
           <p className="text-muted-foreground">
-            เราได้รับข้อความของคุณแล้ว และจะติดต่อกลับโดยเร็วที่สุด
+            เราได้รับข้อความของคุณแล้ว และจะติดต่อกลับให้เร็วที่สุด
           </p>
         </div>
         <Button 
@@ -79,62 +78,60 @@ export default function ContactForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <FieldGroup>
+        <Controller
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ชื่อ</FormLabel>
-              <FormControl>
-                <Input placeholder="กรอกชื่อของคุณ" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>ชื่อ</FieldLabel>
+              <Input placeholder="กรอกชื่อของคุณ" {...field} />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
           )}
         />
-        <FormField
-          control={form.control}
+        <Controller
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="example@email.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
           control={form.control}
-          name="message"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ข้อความ</FormLabel>
-              <FormControl>
-                <Textarea 
-                  rows={5} 
-                  placeholder="พิมพ์ข้อความที่ต้องการ..." 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Email</FieldLabel>
+              <Input type="email" placeholder="example@email.com" {...field} />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
           )}
         />
-        <Button 
-          type="submit" 
-          className="w-full" 
-          disabled={isPending}
-        >
-          {isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          ส่งข้อความ
-        </Button>
-      </form>
-    </Form>
+        <Controller
+          name="message"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>ข้อความ</FieldLabel>
+              <Textarea 
+                rows={5} 
+                placeholder="พิมพ์ข้อความที่ต้องการ..." 
+                {...field} 
+              />
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={isPending}
+      >
+        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        ส่งข้อความ
+      </Button>
+    </form>
   )
 }
