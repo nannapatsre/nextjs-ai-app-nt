@@ -9,7 +9,7 @@ RUN apk add --no-cache libc6-compat
 COPY package.json package-lock.json ./
 
 # ติดตั้ง dependencies ทั้งหมด (รวม devDependencies สำหรับ build)
-RUN npm ci && npm cache clean --force
+RUN npm install && npm cache clean --force
 
 # Stage 2: Builder
 FROM node:24-alpine AS builder
@@ -21,9 +21,13 @@ COPY --from=deps /app/node_modules ./node_modules
 # คัดลอก source code ทั้งหมด
 COPY . .
 
-# ตั้งค่า Dummy DATABASE_URL เพื่อป้องกัน Prisma config ตรวจสอบความถูกต้องของ Env แล้วพังตอน build
+# ตั้งค่า Dummy DATABASE_URL และ Better Auth เพื่อป้องกัน build พัง
 ARG DATABASE_URL=mysql://build:build@localhost:3306/build
 ENV DATABASE_URL=${DATABASE_URL}
+ARG BETTER_AUTH_SECRET=dummy_secret_for_build
+ENV BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+ARG BETTER_AUTH_URL=http://localhost:3000
+ENV BETTER_AUTH_URL=${BETTER_AUTH_URL}
 
 # Generate Prisma Client (v7 ใช้ driver adapter)
 RUN npx prisma generate
